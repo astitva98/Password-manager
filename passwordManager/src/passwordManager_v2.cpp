@@ -28,7 +28,7 @@ string generatePass(){
 		
 	
 	}
-	cout<<password;
+	cout<<password<<endl;
 	return password;
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Generate a random password
 }
@@ -135,24 +135,24 @@ string encrypt(string input){
 
 }
 
-// string encrypt2(string input){
-// 	return  sha256(input);
-// }
+string encrypt2(string input){
+	return sha256(input);
+}
 
 void addUser(string username,string password){
 				ofstream file;
-				// ofstream file2;
+				ofstream file2;
 				username=encrypt(username);
-				password=encrypt(password);
-				//string space=" : ";
-				file.open("../data/file.txt",ios::app);
-				file<<endl<<username+password;
-				string s="../data/";
+				password=encrypt2(password);
+				string space=" : ";
+				file.open("../data2/file2.txt",ios::app);
+				file<<endl<<username+space+password;
+				string s="../data2/";
 				string a=".txt";
-				// file2.open(s+username+a);
+				//file2.open(s+username+a);
 				cout<<"Account created!\n\n";
 				file.close();
-				// file2.close();
+				file2.close();
 				return;
 }
 
@@ -168,7 +168,7 @@ void validUser(string username){
 			switch(choice2){
 				case 1 : {
 					fstream file;
-					string a="../data/";
+					string a="../data2/";
 					string s=".txt";
 					string str=a+username+s;
 					file.open(str);
@@ -186,7 +186,7 @@ void validUser(string username){
 					char flagg='y';
 					while(flagg=='y'){
 					fstream file;
-					string a="../data/";
+					string a="../data2/";
 					string s=".txt";
 					string str=a+username+s;
 					file.open(str,ios::app);
@@ -240,17 +240,15 @@ void validUser(string username){
 
 int authenticate(string input){
 	ifstream fin;
-	cout<<"hellp!\n\n";
+	//cout<<"hellp!\n\n";
 	///cin.ignore();
-	fin.open("../data/file.txt");
+	fin.open("../data2/file2.txt");
 	while(fin){
 		string abc;
 		//cin.ignore();
 		getline(fin,abc);
-		if(abc==input){
-			fin.close();
+		if(abc==input)
 			return 1;
-		}
 	}
 	fin.close();
 	return 0;
@@ -272,9 +270,10 @@ int main(){
 				cout<<"Enter password\n";
 				string password;
 				cin>>password;
-				password=encrypt(password);
+				password=encrypt2(password);
 				cout<<"\n";
-				string final=username+password;
+				string space=" : ";
+				string final=username+space+password;
 				//cout
 				int auth=authenticate(final);
 				if(auth==0){

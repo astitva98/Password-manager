@@ -12,8 +12,6 @@ string generatePass(){
 	srand(time(NULL));
 	string password="";
 	for(int i=0;i<20;i++){
-		///int i=0;
-		//for(i;i<20;i++){
 		int e=rand()%26+65;
 		int f=rand()%26+97;
 		int q=rand()%10+48;
@@ -28,13 +26,12 @@ string generatePass(){
 		
 	
 	}
-	cout<<password;
+	cout<<password<<endl;
 	return password;
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Generate a random password
 }
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Decryption
-string decrypt(string input){
+string decipher(string input){
 	int key=7;
 	{//cout<<"Enter the key\n";
 		//scanf("%d",&key);
@@ -82,8 +79,7 @@ string decrypt(string input){
 	return input;
 }
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Encryption
-string encrypt(string input){
+string cipher(string input){
 
 	int key=7;
 	{// cout<<"Enter the key\n";
@@ -135,32 +131,37 @@ string encrypt(string input){
 
 }
 
-// string encrypt2(string input){
-// 	return  sha256(input);
-// }
+string encrypt2(string input){
+
+	return sha256(input);
+}
 
 void addUser(string username,string password){
 				ofstream file;
-				// ofstream file2;
-				username=encrypt(username);
-				password=encrypt(password);
-				//string space=" : ";
-				file.open("../data/file.txt",ios::app);
-				file<<endl<<username+password;
-				string s="../data/";
+				ofstream file2;
+				uint salt=arc4random();
+				string salty=to_string(salt);
+				username=cipher(username);
+				string saltyPassword=password+salty;
+				password=encrypt2(saltyPassword);
+				string space=" : ";
+				file.open("../data3/file2.txt",ios::app);
+				file<<endl<<username+space+password;
+				string s="../data3/";
 				string a=".txt";
-				// file2.open(s+username+a);
+				file2.open(s+"seasoning"+a,ios::app);
+				file2<<username<<endl<<salt<<endl;
 				cout<<"Account created!\n\n";
 				file.close();
-				// file2.close();
+				file2.close();
 				return;
 }
 
 void validUser(string username){
-	cout<<"Login successful\n\n";
+	cout<<"\nLogin successful\n\n";
 	int flag4=1;
 	while(flag4){
-		cout<<"Press 1 for password list\nPress 2 to add a new password\nPress 0 to logout\n\n";
+		cout<<"\nPress 1 for password list\nPress 2 to add a new password\nPress 3 to search a new password\nPress 0 to logout\n\n";
 		int choice2 ;
 
 		cin>>choice2;
@@ -168,34 +169,34 @@ void validUser(string username){
 			switch(choice2){
 				case 1 : {
 					fstream file;
-					string a="../data/";
+					cout<<"---------------------------------\n"<<endl;
+					string a="../data3/";
 					string s=".txt";
 					string str=a+username+s;
 					file.open(str);
 					while(file){
-						//cin.ignore();
 						string t;
 						getline(file,t);
-						cout<<decrypt(t)<<endl;
+						cout<<decipher(t)<<endl;
 					}
 					file.close();
-					cout<<"----------------------------\n"<<endl;
+					cout<<"---------------------------------\n\n"<<endl;
 					break;
 				}
 				case 2 : {
 					char flagg='y';
 					while(flagg=='y'){
 					fstream file;
-					string a="../data/";
+					string a="../data3/";
 					string s=".txt";
 					string str=a+username+s;
 					file.open(str,ios::app);
 					string website;
-					cout<<"Enter the website\n";
+					cout<<"\nEnter the website\n";
 					cin>>website;
 					string password;
 					char choice3;
-					cout<<"Generate password? (y/n)";
+					cout<<"\nGenerate password? (y/n)\n";
 					cin>>choice3;
 					int flag2=1;
 					while(flag2){
@@ -206,29 +207,63 @@ void validUser(string username){
 								break;
 							}
 							case 'n' : {
-								cout<<"Enter the password\n";
+								cout<<"\nEnter the password\n";
 								cin>>password;
 								flag2=0;
 								break;
 							}
 							default : {
-								cout<<"Wrong choice\nTry again\n\n";
-
+								cout<<"\nWrong choice\nTry again\n\n";
+								cout<<"\nGenerate password? (y/n)\n";
+								cin>>choice3;
+								break;
 							}
 						}
 					}
 					
-					string fin=encrypt(website+"\t"+password);
+					string fin=cipher(website+"\t"+password);
 					file<<endl<<fin;
 					file.close();
-					cout<<"Add another? (y/n)\n\n";
+					cout<<"\nAdd another? (y/n)\n";
 					cin>>flagg;
 
 					}
 					break;
 
 				}
+
+				case 3 : {
+					string pat;
+					cout<<"\nPlease enter querry\n";
+					cin>>pat;
+					fstream file;
+					string a="../data3/";
+					string s=".txt";
+					string str=a+username+s;
+					file.open(str);
+					while(file){
+						string t;
+						getline(file,t);
+						t=decipher(t);
+						int i=0;
+						for(i;i<t.size();i++){
+							if(t[i] == '\t')	break;
+						}
+						string temp = t.substr(0,i);
+						// cout<<t<<'\t'<<t.size()<<endl<<endl;
+						if(temp==pat){
+							file.close();
+							cout<<"\nPassword for "<<temp<<" is : "<<t.substr(i+1)<<endl<<endl;
+							break;
+						}
+
+					}
+					cout<<"\nPassword not found.\nYou may make a new entry\n";
+					file.close();
+					break;
+				}
 				case 0 : {flag4=0;
+							cout<<"Goodbye!\n\n\n\n\n\n\n\n";
 						  break;
 						}
 			}
@@ -240,13 +275,14 @@ void validUser(string username){
 
 int authenticate(string input){
 	ifstream fin;
-	cout<<"hellp!\n\n";
-	///cin.ignore();
-	fin.open("../data/file.txt");
+
+	fin.open("../data3/file2.txt");
+
 	while(fin){
 		string abc;
-		//cin.ignore();
+
 		getline(fin,abc);
+
 		if(abc==input){
 			fin.close();
 			return 1;
@@ -258,58 +294,93 @@ int authenticate(string input){
 
 int main(){
 	char flag='y';
-	cout<<"This is an open source password manager\n\n\n";
+	cout<<"This is an open source password manager\n\n";
 	while(flag=='y'){
-		cout<<"Press 1 to login\nPress 2 to add a new user\nPress 0 to exit\n\n";
+		cout<<"\nPress 1 to login\nPress 2 to add a new user\nPress 0 to exit\n\n";
 		int choice1;
 		cin>>choice1;
 		switch(choice1){
 			case 1: {
-				cout<<"Enter the username bla\n";
+				cout<<"\nEnter the username\n";
 				string username;
 				cin>>username;
-				username=encrypt(username);
-				cout<<"Enter password\n";
+
+				username=cipher(username);
+
+				cout<<"\nEnter password\n";
 				string password;
 				cin>>password;
-				password=encrypt(password);
-				cout<<"\n";
-				string final=username+password;
-				//cout
+
+				string space=" : ";
+				string salty;
+
+				ifstream file3;
+				file3.open("../data3/seasoning.txt");
+				cin.ignore();
+
+				while(file3){
+					string temp;
+					getline(file3,temp);
+					if(temp==username){
+						getline(file3,salty);
+						break;
+					}
+				}
+
+				cout<<salty<<endl;
+
+				password=encrypt2(password+salty);
+				file3.close();
+
+				string final=username+space+password;
+
 				int auth=authenticate(final);
 				if(auth==0){
-					cout<<"Wrong username/password\nTry again\n\n";
+					cout<<"\nWrong username/password\nTry again\n\n";
 					break;
 				}
 				if(auth==1){
-					validUser(decrypt(username));
+					validUser(decipher(username));
 				}
 				break;
 			}
 
 			case 2 : {
-				cout<<"Enter the username\n";
+				cout<<"\nEnter the username\n";
 				string username;
 				cin>>username;
+
 				int flag3=1;
+
 				string password;
-				while(flag3){
-					cout<<"Enter password\n";
+
+				while(flag3==1){
+					cout<<"\nEnter password (length greater than 16), or press 0 to exit\n";
 					string password;
 					cin>>password;
+					if(password == "0"){
+						flag3=-1;
+						break;
+					}
+					if(password.size()<16){
+						cout<<"\npassword too short, please try again\n";
+						continue;
+					}
+
 					string password2;
-					cout<<"Enter again\n";
+					cout<<"\nEnter again\n";
 					cin>>password2;
 					
-						if(password==password2){
+						if(password==password2 ){
 							addUser(username,password);
 							flag3=0;
 						}
 						else{
-							cout<<"Passwords dont match, try again\n";
+							cout<<"\nPasswords dont match, try again\n";
 		
 						}
 				}
+
 				
 				break;
 
@@ -320,7 +391,7 @@ int main(){
 				break;
 			}
 			default : {
-				cout<<"Wrong input\nPlease try again\n\n";
+				cout<<"\nWrong input\nPlease try again\n\n";
 				break;
 			}
 		}

@@ -1,4 +1,0 @@
-
-amazon	ama
-h	q
-w	e
